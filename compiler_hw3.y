@@ -112,49 +112,58 @@ Statement
 Assignment 
     : AssignedExpr '=' Expr  {  if(assigned == 0){
                                     printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
+                                    HAS_ERROR = true;
                                     assigned = 1;
                                 }
                                 if(strcmp($<s_val>1, $<s_val>3) != 0){
                                     if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
                                         printf("error:%d: invalid operation: ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                        HAS_ERROR = true;
                                     }
                                 }
                                 printf("ASSIGN\n"); $$ = $<s_val>1;}
     | AssignedExpr ADD_ASSIGN Expr  {   if(assigned == 0){
                                             printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
                                             assigned = 1;
+                                            HAS_ERROR =true;
                                         }
                                         if(strcmp($<s_val>1, $<s_val>3) != 0){
                                             if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
                                                 printf("error:%d: invalid operation: ADD_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                                HAS_ERROR =true;
                                             }
                                         }
                                         printf("ADD_ASSIGN\n"); $$ = $<s_val>1;
                                     }
     | AssignedExpr SUB_ASSIGN Expr  {   if(assigned == 0){
                                             printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
+                                            HAS_ERROR =true;
                                             assigned = 1;
                                         }
                                         if(strcmp($<s_val>1, $<s_val>3) != 0){
                                             if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
                                                 printf("error:%d: invalid operation: SUB_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                                HAS_ERROR =true;
                                             }
                                         }
                                         printf("SUB_ASSIGN\n"); $$ = $<s_val>1;
                                     }
     | AssignedExpr MUL_ASSIGN Expr  {   if(assigned == 0){
                                             printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
+                                            HAS_ERROR =true;
                                             assigned = 1;
                                         }
                                         if(strcmp($<s_val>1, $<s_val>3) != 0){
                                             if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
                                                 printf("error:%d: invalid operation: MUL_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                                HAS_ERROR =true;
                                             }
                                         }
                                         printf("MUL_ASSIGN\n"); $$ = $<s_val>1;
                                     }
     | AssignedExpr QUO_ASSIGN Expr  {   if(assigned == 0){
                                             printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
+                                            HAS_ERROR =true;
                                             assigned = 1;
                                         }
                                         if(strcmp($<s_val>1, $<s_val>3) != 0){
@@ -166,11 +175,13 @@ Assignment
                                     }
     | AssignedExpr REM_ASSIGN Expr  {   if(assigned == 0){
                                             printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
+                                            HAS_ERROR =true;
                                             assigned = 1;
                                         }
                                         if(strcmp($<s_val>1, $<s_val>3) != 0){
                                             if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
                                                 printf("error:%d: invalid operation: REM_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                                HAS_ERROR =true;
                                             }
                                         }
                                         printf("REM_ASSIGN\n"); $$ = $<s_val>1;
@@ -211,9 +222,11 @@ PrintExpr
 Expr
     : Expr OR ExprAnd    {  if(strcmp($<s_val>1,"bool") != 0){
                                 printf("error:%d: invalid operation: (operator OR not defined on %s)\n",yylineno,$<s_val>1);
+                                HAS_ERROR =true;
                             }
                             else if(strcmp($<s_val>3,"bool") != 0){
                                 printf("error:%d: invalid operation: (operator OR not defined on %s)\n",yylineno,$<s_val>3);
+                                HAS_ERROR =true;
                             }
                             printf("OR\n"); assignAble = 0;$$ = "bool";}
     | ExprAnd {$$=$1;}
@@ -222,9 +235,11 @@ Expr
 ExprAnd
     : ExprAnd AND ExprCompare   {   if(strcmp($<s_val>1,"bool") != 0){
                                         printf("error:%d: invalid operation: (operator AND not defined on %s)\n",yylineno,$<s_val>1);
+                                        HAS_ERROR =true;
                                     }
                                     else if(strcmp($<s_val>3,"bool") != 0){
                                         printf("error:%d: invalid operation: (operator AND not defined on %s)\n",yylineno,$<s_val>3);
+                                        HAS_ERROR =true;
                                     }
                                     printf("AND\n");assignAble = 0; $$ = "bool";}
     | ExprCompare {$$=$1;}
@@ -244,12 +259,14 @@ ExprAdd
     : ExprAdd '+' ExprMul     { if(strcmp($<s_val>1, $<s_val>3) != 0){
                                     if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
                                         printf("error:%d: invalid operation: ADD (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                        HAS_ERROR =true;
                                     }
                                 }
                                 printf("ADD\n");assignAble = 0;$$ =  $<s_val>1;}
     | ExprAdd '-' ExprMul     { if(strcmp($<s_val>1, $<s_val>3) != 0){
                                     if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
                                         printf("error:%d: invalid operation: SUB (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                        HAS_ERROR =true;
                                     }
                                 }
                                 printf("SUB\n");assignAble = 0;$$ =  $<s_val>1;}   
@@ -261,9 +278,11 @@ ExprMul
     | ExprMul '/' ExprUnary         {printf("QUO\n");assignAble = 0; $$ = $<s_val>1;}
     | ExprMul '%' ExprUnary         {   if(strcmp($<s_val>1,"int") != 0){
                                             printf("error:%d: invalid operation: (operator REM not defined on %s)\n",yylineno,$<s_val>1);
+                                            HAS_ERROR =true;
                                         }
                                         else if(strcmp($<s_val>3,"int") != 0){
                                             printf("error:%d: invalid operation: (operator REM not defined on %s)\n",yylineno,$<s_val>3);
+                                            HAS_ERROR =true;
                                         }
                                         printf("REM\n");assignAble = 0; $$ = $<s_val>1;}
     |ExprUnary {$$=$1;}
@@ -324,6 +343,7 @@ Literal
 While
     : WHILE '(' Expr ')'    {   if(strcmp($<s_val>3, "bool") != 0){
                                     printf("error:%d: non-bool (type %s) used as for condition\n",yylineno + 1,$<s_val>3);
+                                    HAS_ERROR =true;
                                 }
                             } Block      
 ;
@@ -331,6 +351,7 @@ While
 If
     : IF  '(' Expr ')' {    if(strcmp($<s_val>3, "bool") != 0){
                                     printf("error:%d: non-bool (type %s) used as for condition\n",yylineno + 1,$<s_val>3);
+                                    HAS_ERROR =true;
                             }
                         } If_block
 ;
@@ -411,6 +432,7 @@ static void insert_symbol(char *name, char *type, char *elementType) {
     }
     if(exist){
         printf("error:%d: %s redeclared in this block. previous declaration at line %d\n",yylineno,name,current->lineno);
+        HAS_ERROR =true;
         return;
     }
 
@@ -447,6 +469,7 @@ static struct Node* lookup_symbol(char *name) {
         }
     }
     printf("error:%d: undefined: %s\n",yylineno,name);
+    HAS_ERROR =true;
     return NULL;
 }
 

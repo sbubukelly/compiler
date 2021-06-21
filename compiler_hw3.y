@@ -61,12 +61,12 @@
     /* ... */
 }
 /* Token without return */
-%token VAR SEMICOLON
+%token SEMICOLON
 %token INT FLOAT BOOL STRING 
 %token INC DEC GEQ LEQ EQL NEQ 
 %token ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN QUO_ASSIGN REM_ASSIGN
 %token AND OR
-%token PRINT PRINTLN
+%token PRINT 
 %token IF ELSE FOR WHILE
 %token TRUE FALSE
 

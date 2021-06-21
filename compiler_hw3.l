@@ -15,7 +15,6 @@ digit [0-9]
 id {letter}+({letter}|{digit})*
 inumber {digit}+
 fnumber ({digit}*\.{digit}+)
-newline		[\n]
 
 %x CMT
 %x STR

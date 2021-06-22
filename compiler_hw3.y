@@ -49,7 +49,7 @@
     static struct Node* lookup_symbol(char *name);
     static void dump_symbol();
     static void print(char *type);
-    static void store(struct Node* *node);
+    static void store(struct Node *node);
 %}
 
 %error-verbose
@@ -217,16 +217,16 @@ TypeName
 IncDecExpr
     : Expr INC       {  char *tmp1;
                         char tmp2;
-                        if(strcmp($<s_val>1,"int") == 0){tmp1 = "1";tmp2 = 'i'}
-                        else if(strcmp($<s_val>1,"float") == 0){tmp1 = "1.0";tmp2 = 'f'}
+                        if(strcmp($<s_val>1,"int") == 0){tmp1 = "1";tmp2 = 'i';}
+                        else if(strcmp($<s_val>1,"float") == 0){tmp1 = "1.0";tmp2 = 'f';}
                         fprintf(fout,"ldc%s\n",tmp1);
                         fprintf(fout,"%cadd\n",tmp2);
                         store(assignedNode);
                         assignAble = 0; $$=$1;}
     | Expr DEC       {  char *tmp1;
                         char tmp2;
-                        if(strcmp($<s_val>1,"int") == 0){tmp1 = "1";tmp2 = 'i'}
-                        else if(strcmp($<s_val>1,"float") == 0){tmp1 = "1.0";tmp2 = 'f'}
+                        if(strcmp($<s_val>1,"int") == 0){tmp1 = "1";tmp2 = 'i';}
+                        else if(strcmp($<s_val>1,"float") == 0){tmp1 = "1.0";tmp2 = 'f';}
                         fprintf(fout,"ldc%s\n",tmp1);
                         fprintf(fout,"%csub\n",tmp2);
                         store(assignedNode);
@@ -234,7 +234,7 @@ IncDecExpr
 ;
 
 PrintExpr
-    : PRINT '(' Expr ')'    { printf("PRINT %s\n", $<s_val>3); }
+    : PRINT '(' Expr ')'    { print($<s_val>3); }
 ;
 
 Expr
@@ -569,7 +569,7 @@ static void insert_symbol(char *name, char *type, char *elementType,int assign) 
     }
 
     if(assign){
-        store(new_node)
+        store(new_node);
     }
 }
 

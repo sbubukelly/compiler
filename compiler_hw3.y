@@ -124,7 +124,7 @@ Assignment
                                         HAS_ERROR = true;
                                     }
                                 }
-                                store(assignedNode)
+                                store(assignedNode);
                                 $$ = $<s_val>1;}
     | AssignedExpr ADD_ASSIGN Expr  {   if(assigned == 0){
                                             printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);

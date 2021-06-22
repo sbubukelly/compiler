@@ -29,13 +29,14 @@
         char *elementType;
         struct Node *next;
     };
-
     struct Node *table[30] = { NULL };
+    
     int Scope = 0;
     int AddressNum = 0;
     char *elementType = NULL;
     char typeChange;
     int assignAble = 1,assigned = 1;
+    struct Node *assignedNode = NULL;
     
     void yyerror (char const *s)
     {
@@ -44,9 +45,11 @@
 
     /* Symbol table function - you can add new function if needed. */
     static void create_symbol();
-    static void insert_symbol(char *name, char *type, char *elementType);
+    static void insert_symbol(char *name, char *type, char *elementType,int assign);
     static struct Node* lookup_symbol(char *name);
     static void dump_symbol();
+    static void print(char *type);
+    static void store(struct Node* *node);
 %}
 
 %error-verbose
@@ -121,7 +124,8 @@ Assignment
                                         HAS_ERROR = true;
                                     }
                                 }
-                                printf("ASSIGN\n"); $$ = $<s_val>1;}
+                                store(assignedNode)
+                                $$ = $<s_val>1;}
     | AssignedExpr ADD_ASSIGN Expr  {   if(assigned == 0){
                                             printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
                                             assigned = 1;
@@ -192,10 +196,10 @@ AssignedExpr
     : Expr {if(assignAble == 0){assigned = 0;}}
 
 DeclarationStmt
-    : Type ID                   {insert_symbol($<s_val>2, $<s_val>1, "-");}
-    | Type ID '=' Expr          {insert_symbol($<s_val>2, $<s_val>1, "-");}
-    | Type ID '[' Expr ']'      {insert_symbol($<s_val>2,"array", $<s_val>1);assignAble = 1;}
-    | Type ID '[' Expr ']' '=' Expr     {insert_symbol($<s_val>2,"array", $<s_val>1);assignAble = 1;}
+    : Type ID                   {insert_symbol($<s_val>2, $<s_val>1, "-",0);}
+    | Type ID '=' Expr          {insert_symbol($<s_val>2, $<s_val>1, "-",1);}
+    | Type ID '[' Expr ']'      {insert_symbol($<s_val>2,"array", $<s_val>1,0);assignAble = 1;}
+    | Type ID '[' Expr ']' '=' Expr     {insert_symbol($<s_val>2,"array", $<s_val>1,1);assignAble = 1;}
 ;
 
 
@@ -211,8 +215,22 @@ TypeName
 ;
 
 IncDecExpr
-    : Expr INC       { printf("INC\n");assignAble = 0; $$=$1;}
-    | Expr DEC       { printf("DEC\n");assignAble = 0; $$=$1;}
+    : Expr INC       {  char *tmp1;
+                        char tmp2;
+                        if(strcmp($<s_val>1,"int") == 0){tmp1 = "1";tmp2 = 'i'}
+                        else if(strcmp($<s_val>1,"float") == 0){tmp1 = "1.0";tmp2 = 'f'}
+                        fprintf(fout,"ldc%s\n",tmp1);
+                        fprintf(fout,"%cadd\n",tmp2);
+                        store(assignedNode);
+                        assignAble = 0; $$=$1;}
+    | Expr DEC       {  char *tmp1;
+                        char tmp2;
+                        if(strcmp($<s_val>1,"int") == 0){tmp1 = "1";tmp2 = 'i'}
+                        else if(strcmp($<s_val>1,"float") == 0){tmp1 = "1.0";tmp2 = 'f'}
+                        fprintf(fout,"ldc%s\n",tmp1);
+                        fprintf(fout,"%csub\n",tmp2);
+                        store(assignedNode);
+                        assignAble = 0; $$=$1;}
 ;
 
 PrintExpr
@@ -262,20 +280,44 @@ ExprAdd
                                         HAS_ERROR =true;
                                     }
                                 }
-                                printf("ADD\n");assignAble = 0;$$ =  $<s_val>1;}
+                                if(strcmp($<s_val>1,"int") == 0){
+                                    fprintf(fout,"iadd\n");
+                                }
+                                else if(strcmp($<s_val>1,"float") == 0){
+                                    fprintf(fout,"fadd\n");
+                                }
+                                assignAble = 0;$$ =  $<s_val>1;}
     | ExprAdd '-' ExprMul     { if(strcmp($<s_val>1, $<s_val>3) != 0){
                                     if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
                                         printf("error:%d: invalid operation: SUB (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
                                         HAS_ERROR =true;
                                     }
                                 }
-                                printf("SUB\n");assignAble = 0;$$ =  $<s_val>1;}   
+                                if(strcmp($<s_val>1,"int") == 0){
+                                    fprintf(fout,"isub\n");
+                                }
+                                else if(strcmp($<s_val>1,"float") == 0){
+                                    fprintf(fout,"fsub\n");
+                                }
+                                assignAble = 0;$$ =  $<s_val>1;}   
     | ExprMul {$$=$1;}               
 ;
 
 ExprMul
-    : ExprMul '*' ExprUnary         {printf("MUL\n");assignAble = 0; $$ = $<s_val>1;}
-    | ExprMul '/' ExprUnary         {printf("QUO\n");assignAble = 0; $$ = $<s_val>1;}
+    : ExprMul '*' ExprUnary         {   if(strcmp($<s_val>1,"int") == 0){
+                                            fprintf(fout,"imul\n");
+                                        }
+                                        else if(strcmp($<s_val>1,"float") == 0){
+                                            fprintf(fout,"fmul\n");
+                                        }
+                                        assignAble = 0; $$ = $<s_val>1;}
+    | ExprMul '/' ExprUnary         {   if(strcmp($<s_val>1,"int") == 0){
+                                            fprintf(fout,"idiv\n");
+                                        }
+                                        else if(strcmp($<s_val>1,"float") == 0){
+                                            fprintf(fout,"fdiv\n");
+                                        }
+                                        assignAble = 0; $$ = $<s_val>1;}
     | ExprMul '%' ExprUnary         {   if(strcmp($<s_val>1,"int") != 0){
                                             printf("error:%d: invalid operation: (operator REM not defined on %s)\n",yylineno,$<s_val>1);
                                             HAS_ERROR =true;
@@ -284,14 +326,24 @@ ExprMul
                                             printf("error:%d: invalid operation: (operator REM not defined on %s)\n",yylineno,$<s_val>3);
                                             HAS_ERROR =true;
                                         }
-                                        printf("REM\n");assignAble = 0; $$ = $<s_val>1;}
+                                        if(strcmp($<s_val>1,"int") == 0){
+                                            fprintf(fout,"idiv\n");
+                                        }
+                                        assignAble = 0; $$ = $<s_val>1;}
     |ExprUnary {$$=$1;}
 ;
 
 ExprUnary
-    : '+' ExprUnary                   { printf("POS\n");assignAble = 0; $$ = $<s_val>2; }
-    | '-' ExprUnary                   { printf("NEG\n");assignAble = 0; $$ = $<s_val>2; }
-    | '!' ExprUnary                   { printf("NOT\n");assignAble = 0; $$ = $<s_val>2; }
+    : '-' ExprUnary                 {   if(strcmp( $<s_val>2,"int") == 0){
+                                            fprintf(fout,"ineg\n");
+                                        }
+                                        else if(strcmp( $<s_val>2,"flaot") == 0){
+                                            fprintf(fout,"fneg\n");
+                                        }  
+                                        assignAble = 0; $$ = $<s_val>2; 
+                                    }
+    | '+' ExprUnary                   { assignAble = 0; $$ = $<s_val>2; }
+    | '!' ExprUnary                   { assignAble = 0; $$ = $<s_val>2; }
     | Primary {$$=$1;}
 
 Primary
@@ -317,11 +369,24 @@ ChangeType
 Operand 
     : ID    {   struct Node *id = lookup_symbol($<s_val>1);
                 if(id != NULL){
-                    printf("IDENT (name=%s, address=%d)\n", id->name, id->address);
+                    if(strcmp(id->type,"int") == 0){
+                        fprintf(fout,"iload%d\n",id->address);
+                    }
+                    else if(strcmp(id->type,"float") == 0){
+                        fprintf(fout,"fload%d\n",id->address);
+                    }
+                    else if(strcmp(id->type,"string") == 0){
+                        fprintf(fout,"aload%d\n",id->address);
+                    }
+                    else if(strcmp(id->type,"bool") == 0){
+                        fprintf(fout,"iload%d\n",id->address);
+                    }
+
                     $$ = id->type;
                     if (strcmp($$, "array") == 0)
                         elementType = id->elementType;
                         assignAble = 1;
+                        assignedNode = id;
                 }
                 else{
                     $$ = "none";
@@ -333,11 +398,11 @@ Operand
 ;
 
 Literal
-    : INT_LIT                   { printf("INT_LIT %d\n", $<i_val>1); $$ = "int"; }
-    | FLOAT_LIT                 { printf("FLOAT_LIT %.6f\n", $<f_val>1); $$ = "float"; }
-    | '\"' STRING_LIT '\"'      { printf("STRING_LIT %s\n", $<s_val>2); $$ = "string"; }
-    | TRUE                      { printf("TRUE\n"); $$ = "bool"; }
-    | FALSE                     { printf("FALSE\n"); $$ = "bool"; }
+    : INT_LIT                   { fprintf(fout,"ldc %d\n", $<i_val>1); $$ = "int"; }
+    | FLOAT_LIT                 { fprintf(fout,"ldc %.6f\n", $<f_val>1); $$ = "float"; }
+    | '\"' STRING_LIT '\"'      { fprintf(fout,"ldc %s\n", $<s_val>2); $$ = "string"; }
+    | TRUE                      { fprintf(fout,"iconst_1\n"); $$ = "bool"; }
+    | FALSE                     { fprintf(fout,"iconst_0\n"); $$ = "bool"; }
 ;
 
 While
@@ -415,11 +480,45 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+static void print(char *type){
+    if(strcmp(type,"bool") != 0){
+        fprintf(fout,"getstatic java/lang/System/out Ljava/io/PrintStream;\n");
+        fprintf(fout,"swap\n");
+        if(strcmp(type,"int") == 0){
+            fprintf(fout,"invokevirtual java/io/PrintStream/println(I)V\n");
+        }
+        else if(strcmp(type,"flaot") == 0){
+            fprintf(fout,"invokevirtual java/io/PrintStream/println(F)V\n");
+        }
+        else if(strcmp(type,"string") == 0){
+            fprintf(fout,"invokevirtual java/io/PrintStream/println((Ljava/lang/String;)V\n");
+        }
+    }
+
+
+    
+    fprintf(fout,"\n");
+}
+
+static void store(struct Node* node){
+    char *type = node->type;
+    int addr = node->address;
+    if(strcmp(type,"int") == 0){
+        fprintf(fout,"istore %d\n",addr);
+    }
+    else if(strcmp(type,"float") == 0){
+        fprintf(fout,"fstore %d\n",addr);
+    }
+    else if(strcmp(type,"string") == 0){
+        fprintf(fout,"astore %d\n",addr);
+    }
+}
+
 static void create_symbol() {
     Scope++;
 }
 
-static void insert_symbol(char *name, char *type, char *elementType) {
+static void insert_symbol(char *name, char *type, char *elementType,int assign) {
     struct Node *current = table[Scope];
     int exist = false;
     while (current != NULL)
@@ -456,6 +555,22 @@ static void insert_symbol(char *name, char *type, char *elementType) {
     }
     
     printf("> Insert {%s} into symbol table (scope level: %d)\n", name, Scope);
+    if(strcmp(type,"int") == 0){
+        fprintf(fout,"ldc 0\n");
+    }
+    else if(strcmp(type,"float") == 0){
+         fprintf(fout,"ldc 0.0\n");
+    }
+    else if(strcmp(type,"string") == 0){
+         fprintf(fout,"ldc \"\"\n");
+    }
+    else if(strcmp(type,"bool") == 0){
+         fprintf(fout,"iconst_0\n");
+    }
+
+    if(assign){
+        store(new_node)
+    }
 }
 
 static struct Node* lookup_symbol(char *name) {

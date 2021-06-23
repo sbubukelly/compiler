@@ -491,8 +491,8 @@ static void print(char *type){
             fprintf(fout,"invokevirtual java/io/PrintStream/print(F)V\n");
         }
         else if(strcmp(type,"string") == 0){
-            fprintf(fout,"invokevirtual java/io/PrintStream/print((Ljava/lang/String;)V\n");
-        }
+            fprintf(fout,"invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V\n");
+        }       
     }
 
 

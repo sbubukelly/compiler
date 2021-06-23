@@ -36,6 +36,7 @@
     char *elementType = NULL;
     char typeChange;
     int assignAble = 1,assigned = 1,assignedID = 1;
+    int boolCount = 0,compareCount = 0;
     struct Node *assignedNode = NULL;
     
     void yyerror (char const *s)
@@ -49,6 +50,7 @@
     static struct Node* lookup_symbol(char *name);
     static void dump_symbol();
     static void print(char *type);
+    static void compare(char *type,char *op);
     static void store(struct Node *node);
 %}
 
@@ -298,12 +300,18 @@ ExprAnd
 ;
 
 ExprCompare
-    : ExprCompare '<' ExprAdd        { printf("LSS\n");assignAble = 0; $$ = "bool"; }
-    | ExprCompare '>' ExprAdd        { printf("GTR\n");assignAble = 0; $$ = "bool";   }
-    | ExprCompare GEQ ExprAdd        { printf("GEQ\n");assignAble = 0; $$ = "bool";  }
-    | ExprCompare LEQ ExprAdd        { printf("LEQ\n");assignAble = 0; $$ = "bool";  }
-    | ExprCompare EQL ExprAdd        { printf("EQL\n");assignAble = 0; $$ = "bool";  }
-    | ExprCompare NEQ ExprAdd        { printf("NEQ\n");assignAble = 0; $$ = "bool";  }
+    : ExprCompare '<' ExprAdd        {  compare($<s_val>1,"iflt");
+                                        assignAble = 0; $$ = "bool"; }
+    | ExprCompare '>' ExprAdd        {  compare($<s_val>1,"ifgt");
+                                        assignAble = 0; $$ = "bool";   }
+    | ExprCompare GEQ ExprAdd        {  compare($<s_val>1,"ifge");
+                                        assignAble = 0; $$ = "bool";   }
+    | ExprCompare LEQ ExprAdd        {  compare($<s_val>1,"ifle");
+                                        assignAble = 0; $$ = "bool";   }
+    | ExprCompare EQL ExprAdd        {  compare($<s_val>1,"ifeq");
+                                        assignAble = 0; $$ = "bool";   }
+    | ExprCompare NEQ ExprAdd        {  compare($<s_val>1,"ifne");
+                                        assignAble = 0; $$ = "bool";   }
     | ExprAdd {$$=$1;}
 ;
 
@@ -377,8 +385,9 @@ ExprUnary
                                         assignAble = 0; $$ = $<s_val>2; 
                                     }
     | '+' ExprUnary                   { assignAble = 0; $$ = $<s_val>2; }
-    | '!' {fprintf(fout,"iconst_1\n");} ExprUnary         {   fprintf(fout,"ixor\n");
-                                                            assignAble = 0; $$ = $<s_val>3; }
+    | '!'  ExprUnary         {      fprintf(fout,"iconst_1\n");
+                                    fprintf(fout,"ixor\n");
+                                    assignAble = 0; $$ = $<s_val>2; }
     | Primary {$$=$1;}
 
 Primary
@@ -529,10 +538,44 @@ static void print(char *type){
             fprintf(fout,"invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V\n");
         }       
     }
+    else if(strcmp(type,"bool") == 0){
+        fprintf(fout,"ifne print_bool_%d\n",boolCount);
+        fprintf(fout,"ldc /"false/"\n");
+        fprintf(fout,"goto print_bool_%d\n",boolCount + 1);
+        fprintf(fout,"print_bool_%d:\n",boolCount);
+        fprintf(fout,"ldc /"true/"\n");
+        fprintf(fout,"print_bool_%d:\n",boolCount +1);
+        fprintf(fout,"getstatic java/lang/System/out Ljava/io/PrintStream;");
+        fprintf(fout,"swap");
+        fprintf(fout,"invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V");
+        boolCount += 2; 
+    }
 
 
     
     fprintf(fout,"\n");
+}
+
+static void compare(char *type,char *op){
+    if(strcmp(type,"int") == 0){
+        fprintf(fout,"isub\n");
+        fprintf(fout,"%s L_cmp_%d",op,compareCount);
+        fprintf(fout,"iconst_0\n");
+        fprintf(fout,"goto L_cmp_%d",compareCount + 1);
+        fprintf(fout,"L_cmp_%d:\n",compareCount);
+        fprintf(fout,"iconst_1\n");
+        fprintf(fout,"L_cmp_%d:\n",compareCount + 1);
+    }
+    else if(strcmp(type,"float") == 0){
+        fprintf(fout,"fcmpl\n");
+        fprintf(fout,"%s L_cmp_%d",op,compareCount);
+        fprintf(fout,"iconst_0\n");
+        fprintf(fout,"goto L_cmp_%d",compareCount + 1);
+        fprintf(fout,"L_cmp_%d:\n",compareCount);
+        fprintf(fout,"iconst_1\n");
+        fprintf(fout,"L_cmp_%d:\n",compareCount + 1);
+    }
+    compareCount += 2;
 }
 
 static void store(struct Node* node){

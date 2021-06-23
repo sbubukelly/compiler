@@ -92,7 +92,7 @@ newline		[\n]
 {id}        { yylval.s_val = strdup(yytext);
                 return ID;
             }
-[\n]        {;}
+{newline}       {;}
 
 <<EOF>>     { static int once = 0;
                 if (once++) {

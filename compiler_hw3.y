@@ -268,7 +268,7 @@ IncDecExpr
 ;
 
 PrintExpr
-    : PRINT {assignedID = 0;}  '(' Expr ')'    { print($<s_val>3); }
+    : PRINT  '(' Expr ')'    { print($<s_val>3); }
 ;
 
 Expr

@@ -545,9 +545,9 @@ static void print(char *type){
         fprintf(fout,"print_bool_%d:\n",boolCount);
         fprintf(fout,"ldc \"true\"\n");
         fprintf(fout,"print_bool_%d:\n",boolCount +1);
-        fprintf(fout,"getstatic java/lang/System/out Ljava/io/PrintStream;");
-        fprintf(fout,"swap");
-        fprintf(fout,"invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V");
+        fprintf(fout,"getstatic java/lang/System/out Ljava/io/PrintStream;\n");
+        fprintf(fout,"swap\n");
+        fprintf(fout,"invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V\n");
         boolCount += 2; 
     }
 
@@ -559,18 +559,18 @@ static void print(char *type){
 static void compare(char *type,char *op){
     if(strcmp(type,"int") == 0){
         fprintf(fout,"isub\n");
-        fprintf(fout,"%s L_cmp_%d",op,compareCount);
+        fprintf(fout,"%s L_cmp_%d\n",op,compareCount);
         fprintf(fout,"iconst_0\n");
-        fprintf(fout,"goto L_cmp_%d",compareCount + 1);
+        fprintf(fout,"goto L_cmp_%d\n",compareCount + 1);
         fprintf(fout,"L_cmp_%d:\n",compareCount);
         fprintf(fout,"iconst_1\n");
         fprintf(fout,"L_cmp_%d:\n",compareCount + 1);
     }
     else if(strcmp(type,"float") == 0){
         fprintf(fout,"fcmpl\n");
-        fprintf(fout,"%s L_cmp_%d",op,compareCount);
+        fprintf(fout,"%s L_cmp_%d\n",op,compareCount);
         fprintf(fout,"iconst_0\n");
-        fprintf(fout,"goto L_cmp_%d",compareCount + 1);
+        fprintf(fout,"goto L_cmp_%d\n",compareCount + 1);
         fprintf(fout,"L_cmp_%d:\n",compareCount);
         fprintf(fout,"iconst_1\n");
         fprintf(fout,"L_cmp_%d:\n",compareCount + 1);

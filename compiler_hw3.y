@@ -379,7 +379,7 @@ ExprUnary
     : '-' ExprUnary                 {   if(strcmp( $<s_val>2,"int") == 0){
                                             fprintf(fout,"ineg\n");
                                         }
-                                        else if(strcmp( $<s_val>2,"flaot") == 0){
+                                        else if(strcmp( $<s_val>2,"float") == 0){
                                             fprintf(fout,"fneg\n");
                                         }  
                                         assignAble = 0; $$ = $<s_val>2; 

@@ -401,12 +401,12 @@ Array
 ;
 
 ChangeType
-    : '(' Type ')' Expr    {   if(strcmp($<s_val>4, "int") == 0) typeChange = 'I';
-                                else{typeChange = 'F';}
-                                printf("%c to ",typeChange);
-                                if(strcmp($<s_val>2, "int") == 0) typeChange = 'I';
-                                else{typeChange = 'F';}
-                                printf("%c\n",typeChange);
+    : '(' Type ')' Expr    {   if(strcmp($<s_val>4, "int") == 0) typeChange = 'i';
+                                else{typeChange = 'f';}
+                                fprintf(fout,"%c2",typeChange);
+                                if(strcmp($<s_val>2, "int") == 0) typeChange = 'i';
+                                else{typeChange = 'f';}
+                                fprintf(fout,"%c\n",typeChange);
                                 $$ = $2;
                             }
 ;

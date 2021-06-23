@@ -485,13 +485,13 @@ static void print(char *type){
         fprintf(fout,"getstatic java/lang/System/out Ljava/io/PrintStream;\n");
         fprintf(fout,"swap\n");
         if(strcmp(type,"int") == 0){
-            fprintf(fout,"invokevirtual java/io/PrintStream/println(I)V\n");
+            fprintf(fout,"invokevirtual java/io/PrintStream/print(I)V\n");
         }
         else if(strcmp(type,"flaot") == 0){
-            fprintf(fout,"invokevirtual java/io/PrintStream/println(F)V\n");
+            fprintf(fout,"invokevirtual java/io/PrintStream/print(F)V\n");
         }
         else if(strcmp(type,"string") == 0){
-            fprintf(fout,"invokevirtual java/io/PrintStream/println((Ljava/lang/String;)V\n");
+            fprintf(fout,"invokevirtual java/io/PrintStream/print((Ljava/lang/String;)V\n");
         }
     }
 

@@ -400,7 +400,7 @@ Operand
 Literal
     : INT_LIT                   { fprintf(fout,"ldc %d\n", $<i_val>1); $$ = "int"; }
     | FLOAT_LIT                 { fprintf(fout,"ldc %.6f\n", $<f_val>1); $$ = "float"; }
-    | '\"' STRING_LIT '\"'      { fprintf(fout,"ldc "%s"\n", $<s_val>2); $$ = "string"; }
+    | '\"' STRING_LIT '\"'      { fprintf(fout,"ldc \"%s\"\n", $<s_val>2); $$ = "string"; }
     | TRUE                      { fprintf(fout,"iconst_1\n"); $$ = "bool"; }
     | FALSE                     { fprintf(fout,"iconst_0\n"); $$ = "bool"; }
 ;

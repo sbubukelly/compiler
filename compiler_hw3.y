@@ -413,19 +413,17 @@ ChangeType
 Operand 
     : ID    {   struct Node *id = lookup_symbol($<s_val>1);
                 if(id != NULL){
-                    if(assignedID == 0){
-                        if(strcmp(id->type,"int") == 0){
-                            fprintf(fout,"iload %d\n",id->address);
-                        }
-                        else if(strcmp(id->type,"float") == 0){
-                            fprintf(fout,"fload %d\n",id->address);
-                        }
-                        else if(strcmp(id->type,"string") == 0){
-                            fprintf(fout,"aload %d\n",id->address);
-                        }
-                        else if(strcmp(id->type,"bool") == 0){
-                            fprintf(fout,"iload %d\n",id->address);
-                        }
+                    if(strcmp(id->type,"int") == 0){
+                        fprintf(fout,"iload %d\n",id->address);
+                    }
+                    else if(strcmp(id->type,"float") == 0){
+                        fprintf(fout,"fload %d\n",id->address);
+                    }
+                    else if(strcmp(id->type,"string") == 0){
+                        fprintf(fout,"aload %d\n",id->address);
+                    }
+                    else if(strcmp(id->type,"bool") == 0){
+                        fprintf(fout,"iload %d\n",id->address);
                     }
                     $$ = id->type;
                     if (strcmp($$, "array") == 0)

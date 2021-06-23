@@ -35,7 +35,7 @@
     int AddressNum = 0;
     char *elementType = NULL;
     char typeChange;
-    int assignAble = 1,assigned = 1;
+    int assignAble = 1,assigned = 1,assignedID = 1;
     struct Node *assignedNode = NULL;
     
     void yyerror (char const *s)
@@ -113,83 +113,115 @@ Statement
 ;
 
 Assignment 
-    : AssignedExpr '=' Expr  {  if(assigned == 0){
-                                    printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
-                                    HAS_ERROR = true;
-                                    assigned = 1;
-                                }
-                                if(strcmp($<s_val>1, $<s_val>3) != 0){
-                                    if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
-                                        printf("error:%d: invalid operation: ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
-                                        HAS_ERROR = true;
-                                    }
-                                }
-                                store(assignedNode);
-                                $$ = $<s_val>1;}
-    | AssignedExpr ADD_ASSIGN Expr  {   if(assigned == 0){
-                                            printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
-                                            assigned = 1;
-                                            HAS_ERROR =true;
-                                        }
-                                        if(strcmp($<s_val>1, $<s_val>3) != 0){
-                                            if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
-                                                printf("error:%d: invalid operation: ADD_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
-                                                HAS_ERROR =true;
-                                            }
-                                        }
-                                        printf("ADD_ASSIGN\n"); $$ = $<s_val>1;
-                                    }
-    | AssignedExpr SUB_ASSIGN Expr  {   if(assigned == 0){
-                                            printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
-                                            HAS_ERROR =true;
-                                            assigned = 1;
-                                        }
-                                        if(strcmp($<s_val>1, $<s_val>3) != 0){
-                                            if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
-                                                printf("error:%d: invalid operation: SUB_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
-                                                HAS_ERROR =true;
-                                            }
-                                        }
-                                        printf("SUB_ASSIGN\n"); $$ = $<s_val>1;
-                                    }
-    | AssignedExpr MUL_ASSIGN Expr  {   if(assigned == 0){
-                                            printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
-                                            HAS_ERROR =true;
-                                            assigned = 1;
-                                        }
-                                        if(strcmp($<s_val>1, $<s_val>3) != 0){
-                                            if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
-                                                printf("error:%d: invalid operation: MUL_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
-                                                HAS_ERROR =true;
-                                            }
-                                        }
-                                        printf("MUL_ASSIGN\n"); $$ = $<s_val>1;
-                                    }
-    | AssignedExpr QUO_ASSIGN Expr  {   if(assigned == 0){
-                                            printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
-                                            HAS_ERROR =true;
-                                            assigned = 1;
-                                        }
-                                        if(strcmp($<s_val>1, $<s_val>3) != 0){
-                                            if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
-                                                printf("error:%d: invalid operation: QUO_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
-                                            }
-                                        }
-                                        printf("QUO_ASSIGN\n"); $$ = $<s_val>1;
-                                    }
-    | AssignedExpr REM_ASSIGN Expr  {   if(assigned == 0){
-                                            printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
-                                            HAS_ERROR =true;
-                                            assigned = 1;
-                                        }
-                                        if(strcmp($<s_val>1, $<s_val>3) != 0){
-                                            if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
-                                                printf("error:%d: invalid operation: REM_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
-                                                HAS_ERROR =true;
-                                            }
-                                        }
-                                        printf("REM_ASSIGN\n"); $$ = $<s_val>1;
-                                    }
+    : AssignedExpr {assignedID = 0;} '=' Expr   {   if(assigned == 0){
+                                                        printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
+                                                        HAS_ERROR = true;
+                                                        assigned = 1;
+                                                    }
+                                                    if(strcmp($<s_val>1, $<s_val>4) != 0){
+                                                        if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>4, "none") != 0){
+                                                            printf("error:%d: invalid operation: ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                                            HAS_ERROR = true;
+                                                        }
+                                                    }
+                                                    store(assignedNode);
+                                                    assignedID = 1;$$ = $<s_val>1;
+                                                }
+    | AssignedExpr {assignedID = 0;} ADD_ASSIGN Expr    {   if(assigned == 0){
+                                                                printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
+                                                                assigned = 1;
+                                                                HAS_ERROR =true;
+                                                            }
+                                                            if(strcmp($<s_val>1, $<s_val>4) != 0){
+                                                                if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>4, "none") != 0){
+                                                                    printf("error:%d: invalid operation: ADD_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                                                    HAS_ERROR =true;
+                                                                }
+                                                            }
+                                                            if(strcmp($<s_val>1,"int") == 0){
+                                                                fprintf(fout,"iadd\n");
+                                                            }
+                                                            else if(strcmp($<s_val>1,"float") == 0){
+                                                                fprintf(fout,"fadd\n");
+                                                            }
+                                                            store(assignedNode);
+                                                            assignedID = 1;$$ = $<s_val>1;
+                                                        }
+    | AssignedExpr {assignedID = 0;} SUB_ASSIGN Expr    {   if(assigned == 0){
+                                                                printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
+                                                                HAS_ERROR =true;
+                                                                assigned = 1;
+                                                            }
+                                                            if(strcmp($<s_val>1, $<s_val>4) != 0){
+                                                                if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>4, "none") != 0){
+                                                                    printf("error:%d: invalid operation: SUB_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                                                    HAS_ERROR =true;
+                                                                }
+                                                            }
+                                                            if(strcmp($<s_val>1,"int") == 0){
+                                                                fprintf(fout,"isub\n");
+                                                            }
+                                                            else if(strcmp($<s_val>1,"float") == 0){
+                                                                fprintf(fout,"fsub\n");
+                                                            }
+                                                            store(assignedNode); 
+                                                            assignedID = 1;$$ = $<s_val>1;
+                                                        }
+    | AssignedExpr {assignedID = 0;} MUL_ASSIGN Expr    {   if(assigned == 0){
+                                                                printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
+                                                                HAS_ERROR =true;
+                                                                assigned = 1;
+                                                            }
+                                                            if(strcmp($<s_val>1, $<s_val>4) != 0){
+                                                                if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>4, "none") != 0){
+                                                                    printf("error:%d: invalid operation: MUL_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                                                    HAS_ERROR =true;
+                                                                }
+                                                            }
+                                                            if(strcmp($<s_val>1,"int") == 0){
+                                                                fprintf(fout,"imul\n");
+                                                            }
+                                                            else if(strcmp($<s_val>1,"float") == 0){
+                                                                fprintf(fout,"fmul\n");
+                                                            }
+                                                            store(assignedNode);
+                                                            assignedID =1;$$ = $<s_val>1;
+                                                        }
+    | AssignedExpr {assignedID = 0;} QUO_ASSIGN Expr    {   if(assigned == 0){
+                                                                printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
+                                                                HAS_ERROR =true;
+                                                                assigned = 1;
+                                                            }
+                                                            if(strcmp($<s_val>1, $<s_val>4) != 0){
+                                                                if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>4, "none") != 0){
+                                                                    printf("error:%d: invalid operation: QUO_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                                                }
+                                                            }if(strcmp($<s_val>1,"int") == 0){
+                                                                fprintf(fout,"idiv\n");
+                                                            }
+                                                            else if(strcmp($<s_val>1,"float") == 0){
+                                                                fprintf(fout,"fdiv\n");
+                                                            }
+                                                            store(assignedNode);
+                                                            assignedID = 1;$$ = $<s_val>1;
+                                                        }
+    | AssignedExpr {assignedID = 0;} REM_ASSIGN Expr    {   if(assigned == 0){
+                                                                printf("error:%d: cannot assign to %s\n",yylineno,$<s_val>1);
+                                                                HAS_ERROR =true;
+                                                                assigned = 1;
+                                                            }
+                                                            if(strcmp($<s_val>1, $<s_val>4) != 0){
+                                                                if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>4, "none") != 0){
+                                                                    printf("error:%d: invalid operation: REM_ASSIGN (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
+                                                                    HAS_ERROR =true;
+                                                                }
+                                                            }
+                                                            if(strcmp($<s_val>1,"int") == 0){
+                                                                fprintf(fout,"irem\n");
+                                                            }
+                                                            store(assignedNode); 
+                                                            assignedID = 1;$$ = $<s_val>1;
+                                                        }
 ;
 
 AssignedExpr
@@ -246,7 +278,8 @@ Expr
                                 printf("error:%d: invalid operation: (operator OR not defined on %s)\n",yylineno,$<s_val>3);
                                 HAS_ERROR =true;
                             }
-                            printf("OR\n"); assignAble = 0;$$ = "bool";}
+                            fprintf(fout,"ior\n");
+                            assignAble = 0;$$ = "bool";}
     | ExprAnd {$$=$1;}
 ;
 
@@ -259,7 +292,8 @@ ExprAnd
                                         printf("error:%d: invalid operation: (operator AND not defined on %s)\n",yylineno,$<s_val>3);
                                         HAS_ERROR =true;
                                     }
-                                    printf("AND\n");assignAble = 0; $$ = "bool";}
+                                    fprintf(fout,"iand\n");
+                                    assignAble = 0; $$ = "bool";}
     | ExprCompare {$$=$1;}
 ;
 
@@ -343,7 +377,8 @@ ExprUnary
                                         assignAble = 0; $$ = $<s_val>2; 
                                     }
     | '+' ExprUnary                   { assignAble = 0; $$ = $<s_val>2; }
-    | '!' ExprUnary                   { assignAble = 0; $$ = $<s_val>2; }
+    | '!' {fprintf(fout,"iconst_1\n");} ExprUnary         {   fprintf(fout,"ixor\n");
+                                                            assignAble = 0; $$ = $<s_val>3; }
     | Primary {$$=$1;}
 
 Primary
@@ -385,8 +420,8 @@ Operand
                     $$ = id->type;
                     if (strcmp($$, "array") == 0)
                         elementType = id->elementType;
-                        assignAble = 1;
-                        assignedNode = id;
+                    assignAble = 1;
+                    assignedNode = id;
                 }
                 else{
                     $$ = "none";

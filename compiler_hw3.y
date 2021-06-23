@@ -268,7 +268,7 @@ IncDecExpr
 ;
 
 PrintExpr
-    : PRINT  '(' Expr ')'    { print($<s_val>3); }
+    : PRINT '(' Expr ')'    { print($<s_val>3); }
 ;
 
 Expr
@@ -413,19 +413,17 @@ ChangeType
 Operand 
     : ID    {   struct Node *id = lookup_symbol($<s_val>1);
                 if(id != NULL){
-                    if(assignedID == 0){
-                        if(strcmp(id->type,"int") == 0){
-                            fprintf(fout,"iload %d\n",id->address);
-                        }
-                        else if(strcmp(id->type,"float") == 0){
-                            fprintf(fout,"fload %d\n",id->address);
-                        }
-                        else if(strcmp(id->type,"string") == 0){
-                            fprintf(fout,"aload %d\n",id->address);
-                        }
-                        else if(strcmp(id->type,"bool") == 0){
-                            fprintf(fout,"iload %d\n",id->address);
-                        }
+                    if(strcmp(id->type,"int") == 0){
+                        fprintf(fout,"iload %d\n",id->address);
+                    }
+                    else if(strcmp(id->type,"float") == 0){
+                       fprintf(fout,"fload %d\n",id->address);
+                    }
+                    else if(strcmp(id->type,"string") == 0){
+                        fprintf(fout,"aload %d\n",id->address);
+                    }
+                    else if(strcmp(id->type,"bool") == 0){
+                        fprintf(fout,"iload %d\n",id->address);
                     }
                     $$ = id->type;
                     if (strcmp($$, "array") == 0)
@@ -529,6 +527,7 @@ int main(int argc, char *argv[])
 }
 
 static void print(char *type){
+
     if(strcmp(type,"bool") != 0){
         fprintf(fout,"getstatic java/lang/System/out Ljava/io/PrintStream;\n");
         fprintf(fout,"swap\n");

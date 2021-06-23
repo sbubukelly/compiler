@@ -219,7 +219,7 @@ IncDecExpr
                         char tmp2;
                         if(strcmp($<s_val>1,"int") == 0){tmp1 = "1";tmp2 = 'i';}
                         else if(strcmp($<s_val>1,"float") == 0){tmp1 = "1.0";tmp2 = 'f';}
-                        fprintf(fout,"ldc%s\n",tmp1);
+                        fprintf(fout,"ldc %s\n",tmp1);
                         fprintf(fout,"%cadd\n",tmp2);
                         store(assignedNode);
                         assignAble = 0; $$=$1;}
@@ -227,7 +227,7 @@ IncDecExpr
                         char tmp2;
                         if(strcmp($<s_val>1,"int") == 0){tmp1 = "1";tmp2 = 'i';}
                         else if(strcmp($<s_val>1,"float") == 0){tmp1 = "1.0";tmp2 = 'f';}
-                        fprintf(fout,"ldc%s\n",tmp1);
+                        fprintf(fout,"ldc %s\n",tmp1);
                         fprintf(fout,"%csub\n",tmp2);
                         store(assignedNode);
                         assignAble = 0; $$=$1;}
@@ -370,16 +370,16 @@ Operand
     : ID    {   struct Node *id = lookup_symbol($<s_val>1);
                 if(id != NULL){
                     if(strcmp(id->type,"int") == 0){
-                        fprintf(fout,"iload%d\n",id->address);
+                        fprintf(fout,"iload %d\n",id->address);
                     }
                     else if(strcmp(id->type,"float") == 0){
-                        fprintf(fout,"fload%d\n",id->address);
+                        fprintf(fout,"fload %d\n",id->address);
                     }
                     else if(strcmp(id->type,"string") == 0){
-                        fprintf(fout,"aload%d\n",id->address);
+                        fprintf(fout,"aload %d\n",id->address);
                     }
                     else if(strcmp(id->type,"bool") == 0){
-                        fprintf(fout,"iload%d\n",id->address);
+                        fprintf(fout,"iload %d\n",id->address);
                     }
 
                     $$ = id->type;
@@ -400,7 +400,7 @@ Operand
 Literal
     : INT_LIT                   { fprintf(fout,"ldc %d\n", $<i_val>1); $$ = "int"; }
     | FLOAT_LIT                 { fprintf(fout,"ldc %.6f\n", $<f_val>1); $$ = "float"; }
-    | '\"' STRING_LIT '\"'      { fprintf(fout,"ldc %s\n", $<s_val>2); $$ = "string"; }
+    | '\"' STRING_LIT '\"'      { fprintf(fout,"ldc "%s"\n", $<s_val>2); $$ = "string"; }
     | TRUE                      { fprintf(fout,"iconst_1\n"); $$ = "bool"; }
     | FALSE                     { fprintf(fout,"iconst_0\n"); $$ = "bool"; }
 ;
@@ -555,18 +555,23 @@ static void insert_symbol(char *name, char *type, char *elementType,int assign) 
     }
     
     printf("> Insert {%s} into symbol table (scope level: %d)\n", name, Scope);
-    if(strcmp(type,"int") == 0){
-        fprintf(fout,"ldc 0\n");
+
+    if(!assign){
+        if(strcmp(type,"int") == 0){
+            fprintf(fout,"ldc 0\n");
+        }   
+        else if(strcmp(type,"float") == 0){
+            fprintf(fout,"ldc 0.0\n");
+        }
+        else if(strcmp(type,"string") == 0){
+            fprintf(fout,"ldc \"\"\n");
+        }
+        else if(strcmp(type,"bool") == 0){
+            fprintf(fout,"iconst_0\n");
+        }
     }
-    else if(strcmp(type,"float") == 0){
-         fprintf(fout,"ldc 0.0\n");
-    }
-    else if(strcmp(type,"string") == 0){
-         fprintf(fout,"ldc \"\"\n");
-    }
-    else if(strcmp(type,"bool") == 0){
-         fprintf(fout,"iconst_0\n");
-    }
+
+    
 
     if(assign){
         store(new_node);

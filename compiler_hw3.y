@@ -540,10 +540,10 @@ static void print(char *type){
     }
     else if(strcmp(type,"bool") == 0){
         fprintf(fout,"ifne print_bool_%d\n",boolCount);
-        fprintf(fout,"ldc /"false/"\n");
+        fprintf(fout,"ldc \"false\"\n");
         fprintf(fout,"goto print_bool_%d\n",boolCount + 1);
         fprintf(fout,"print_bool_%d:\n",boolCount);
-        fprintf(fout,"ldc /"true/"\n");
+        fprintf(fout,"ldc \"true\"\n");
         fprintf(fout,"print_bool_%d:\n",boolCount +1);
         fprintf(fout,"getstatic java/lang/System/out Ljava/io/PrintStream;");
         fprintf(fout,"swap");

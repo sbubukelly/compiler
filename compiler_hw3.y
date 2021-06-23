@@ -654,9 +654,8 @@ static void insert_symbol(char *name, char *type, char *elementType,int assign) 
 
     
 
-    if(assign){
         store(new_node);
-    }
+    
 }
 
 static struct Node* lookup_symbol(char *name) {

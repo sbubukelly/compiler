@@ -530,7 +530,9 @@ ElseBlock
 For
     :FOR '(' Assignment SEMICOLON { fprintf(fout,"L_for_start:\n");
                                     } Expr {   fprintf(fout,"ifeq L_for_exit\n");
-                                    } SEMICOLON  ID IncDecFor ')' Block  {   
+                                    } SEMICOLON ID INC ')' Block  {
+                                        struct Node *tmp = lookup_symbol($<s_val>9);
+                                        fprintf(fout,"iload%d",tmp->address);
                                         fprintf(fout,"ldc %c\n",'1');
                                         fprintf(fout,"%cadd\n",'i');
                                         store(assignedNode);
@@ -540,10 +542,6 @@ For
 
 ;
 
-IncDecFor
-    :INC
-    |DEC
-;
 
 Block
     : '{'{ create_symbol(); } StatementList '}'        { dump_symbol(); }

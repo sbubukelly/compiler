@@ -35,7 +35,7 @@
     int AddressNum = 0;
     char *elementType = NULL;
     char typeChange;
-    int assignAble = 1,assigned = 1,assignedID = 1;
+    int assignAble = 1,assigned = 1,assignedID = 1,a = 0;
     int boolCount = 0,compareCount = 0;
     struct Node *assignedNode = NULL;
     
@@ -233,7 +233,7 @@ DeclarationStmt
     : Type ID                   {insert_symbol($<s_val>2, $<s_val>1, "-",0);}
     | Type ID '=' Expr          {insert_symbol($<s_val>2, $<s_val>1, "-",1);}
     | Type ID '[' Expr ']'      {insert_symbol($<s_val>2,"array", $<s_val>1,0);assignAble = 1;}
-    | Type ID '[' Expr ']' '=' Expr     {insert_symbol($<s_val>2,"array", $<s_val>1,1);assignAble = 1;}
+    | Type ID '[' Expr ']' '=' Expr     {insert_symbol($<s_val>2,"array", $<s_val>1);assignAble = 1;}
 ;
 
 
@@ -425,6 +425,9 @@ Operand
                     else if(strcmp(id->type,"bool") == 0){
                         fprintf(fout,"iload %d\n",id->address);
                     }
+                    else if(strcmp(id->type,"array") == 0){
+                        fprintf(fout,"aload %d\n",id->address);
+                    }
                     $$ = id->type;
                     if (strcmp($$, "array") == 0)
                         elementType = id->elementType;
@@ -584,6 +587,7 @@ static void compare(char *type,char *op){
 static void store(struct Node* node){
     char *type = node->type;
     int addr = node->address;
+    char *eleType = node -> elementType;
     if(strcmp(type,"int") == 0){
         fprintf(fout,"istore %d\n",addr);
     }
@@ -592,6 +596,9 @@ static void store(struct Node* node){
     }
     else if(strcmp(type,"string") == 0){
         fprintf(fout,"astore %d\n",addr);
+    }
+    else if(strcmp(type,"array") == 0){
+        fprintf(fout,"%castore\n",eleType[0]);
     }
 }
 
@@ -637,6 +644,11 @@ static void insert_symbol(char *name, char *type, char *elementType,int assign) 
     
     printf("> Insert {%s} into symbol table (scope level: %d)\n", name, Scope);
 
+    if(strcmp(type,"array") == 0){
+         fprintf(fout,"newarray %s\n",elementType);
+         fprintf(fout,"astore %d",addr);
+    }
+
     if(!assign){
         if(strcmp(type,"int") == 0){
             fprintf(fout,"ldc 0\n");
@@ -651,10 +663,7 @@ static void insert_symbol(char *name, char *type, char *elementType,int assign) 
             fprintf(fout,"iconst_0\n");
         }
     }
-
-    
-
-        store(new_node);
+    store(new_node);
     
 }
 

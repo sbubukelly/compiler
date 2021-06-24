@@ -744,7 +744,6 @@ static void insert_symbol(char *name, char *type, char *elementType,int assign) 
         current->next = new_node;
     }
     
-    printf("> Insert {%s} into symbol table (scope level: %d)\n", name, Scope);
 
 
     if(!assign){
@@ -792,14 +791,9 @@ static struct Node* lookup_symbol(char *name) {
 }
 
 static void dump_symbol() {
-
-    printf("> Dump symbol table (scope level: %d)\n", Scope);
-    printf("%-10s%-10s%-10s%-10s%-10s%s\n", "Index", "Name", "Type", "Address", "Lineno",
-    "Element type");
     int index = 0;
     struct Node *node = table[Scope];
     while (node != NULL) {
-        printf("%-10d%-10s%-10s%-10d%-10d%s\n",index++, node->name, node->type, node->address, node->lineno, node->elementType);
         struct Node *tmp = node;
         node = node->next;
         free(tmp);

@@ -528,7 +528,7 @@ ElseBlock
 
 
 For
-    ::FOR '(' Assignment SEMICOLON { fprintf(fout,"L_for_start:\n");
+    :FOR '(' Assignment SEMICOLON { fprintf(fout,"L_for_start:\n");
                                     } Expr {   fprintf(fout,"ifeq L_for_exit\n");
                                     } SEMICOLON ID ForIncDec
 

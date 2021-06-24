@@ -36,10 +36,15 @@
     char *elementType = NULL;
     char typeChange;
     int assignAble = 1,assigned = 1,assignedID = 1,arr = 0;
-    int boolCount = 0,compareCount = 0;
+    int boolCount = 0,compareCount = 0,IfCount = 0;
+    int IfStack[10],IfStackCount = 0;
     char *incdec = NULL;
     struct Node *assignedNode = NULL;
     
+    for(int i = 0;i < 10;i ++){
+        IfStack[i] = -1;
+    }
+
     void yyerror (char const *s)
     {
         printf("error:%d: %s\n", yylineno, s);
@@ -473,13 +478,54 @@ If
                                     printf("error:%d: non-bool (type %s) used as for condition\n",yylineno + 1,$<s_val>3);
                                     HAS_ERROR =true;
                             }
-                        } If_block
+                            fprintf(fout,"ifeq L_if_false_%d/n",IfCount);
+                            IfStack[IfStackCount] = IfCount;
+                            IfStackCount++;
+                            IfCount ++;
+                        } If_block {
+                            int curStack = 0;
+                            for(int i = 9;i >=0;i --){
+                                if(IfStack[i] != -1){
+                                    curStack = i;
+                                    break;
+                                }
+                            }
+                            fprintf(fout,"L_if_false_%d:/n",IfStack[curStack]);
+                            IfStack[curStack] = -1;
+                            IfStackCount--;
+                        }
 ;
 
 If_block
     : Block     
-    | Block ELSE Block
-    | Block ELSE If
+    | Block {   int curStack = 0;
+                for(int i = 9;i >=0;i --){
+                    if(IfStack[i] != -1){
+                        curStack = i;
+                        break;
+                    }
+                }
+                fprintf(fout,"L_if_false_%d:/n",IfStack[curStack]);
+                IfStack[curStack] = -1;
+                IfStackCount--;
+                
+            }ELSE { fprintf(fout,"ifeq L_if_false_%d/n",IfCount);
+                    IfStack[IfStackCount] = IfCount;
+                    IfStackCount++;
+                    IfCount ++;
+            }Block 
+    | Block {   int curStack = 0;
+                for(int i = 9;i >=0;i --){
+                    if(IfStack[i] != -1){
+                        curStack = i;
+                        break;
+                    }
+                }
+                fprintf(fout,"L_if_false_%d:/n",IfStack[curStack]);
+                IfStack[curStack] = -1;
+                IfStackCount--;
+                
+            }ELSE If
 ;
 
 
@@ -491,13 +537,7 @@ For
 ;
 
 ForClause
-    : Assignment SEMICOLON {char *tmp1;
-                            char tmp2;
-                            if(strcmp($<s_val>1,"int") == 0){tmp1 = "1";tmp2 = 'i';}
-                            else if(strcmp($<s_val>1,"float") == 0){tmp1 = "1.0";tmp2 = 'f';}
-                            fprintf(fout,"ldc %s\n",tmp1);
-                            fprintf(fout,"%cadd\n",tmp2);
-                            store(assignedNode);fprintf(fout,"L_for_start:\n");} Expr {fprintf(fout,"ifeq L_for_exit\n");} SEMICOLON  IncDecExpr
+    : Assignment SEMICOLON {fprintf(fout,"L_for_start:\n");} Expr {fprintf(fout,"ifeq L_for_exit\n");} SEMICOLON  IncDecExpr
 
 Block
     : '{'{ create_symbol(); } StatementList '}'        { dump_symbol(); }

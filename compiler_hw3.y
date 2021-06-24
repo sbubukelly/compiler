@@ -35,7 +35,7 @@
     int AddressNum = 0;
     char *elementType = NULL;
     char typeChange;
-    int assignAble = 1,assigned = 1,assignedID = 1;
+    int assignAble = 1,assigned = 1,assignedID = 1,arr = 0;
     int boolCount = 0,compareCount = 0;
     struct Node *assignedNode = NULL;
     
@@ -400,6 +400,7 @@ Array
     : Operand '[' Expr ']'      {   if(assignedID == 0){
                                         fprintf(fout,"%caload\n",elementType[0]);
                                     }
+                                    arr = 1;
                                     $$ = elementType; assignAble = 1; }
 ;
 
@@ -533,7 +534,7 @@ int main(int argc, char *argv[])
 }
 
 static void print(char *type){
-    if(elementType != NULL){
+    if(arr == 1){
         fprintf(fout,"%caload",type[0]);
     }
     if(strcmp(type,"bool") != 0){

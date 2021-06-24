@@ -281,6 +281,7 @@ Expr
                                 HAS_ERROR =true;
                             }
                             fprintf(fout,"ior\n");
+                            arr = 0;
                             assignAble = 0;$$ = "bool";}
     | ExprAnd {$$=$1;}
 ;
@@ -295,23 +296,23 @@ ExprAnd
                                         HAS_ERROR =true;
                                     }
                                     fprintf(fout,"iand\n");
-                                    assignAble = 0; $$ = "bool";}
+                                    arr = 0;assignAble = 0; $$ = "bool";}
     | ExprCompare {$$=$1;}
 ;
 
 ExprCompare
     : ExprCompare '<' ExprAdd        {  compare($<s_val>1,"iflt");
-                                        assignAble = 0; $$ = "bool"; }
+                                        arr = 0;assignAble = 0; $$ = "bool"; }
     | ExprCompare '>' ExprAdd        {  compare($<s_val>1,"ifgt");
-                                        assignAble = 0; $$ = "bool";   }
+                                        arr = 0;assignAble = 0; $$ = "bool";   }
     | ExprCompare GEQ ExprAdd        {  compare($<s_val>1,"ifge");
-                                        assignAble = 0; $$ = "bool";   }
+                                        arr = 0;assignAble = 0; $$ = "bool";   }
     | ExprCompare LEQ ExprAdd        {  compare($<s_val>1,"ifle");
-                                        assignAble = 0; $$ = "bool";   }
+                                        arr = 0;assignAble = 0; $$ = "bool";   }
     | ExprCompare EQL ExprAdd        {  compare($<s_val>1,"ifeq");
-                                        assignAble = 0; $$ = "bool";   }
+                                        arr = 0;assignAble = 0; $$ = "bool";   }
     | ExprCompare NEQ ExprAdd        {  compare($<s_val>1,"ifne");
-                                        assignAble = 0; $$ = "bool";   }
+                                        arr = 0;assignAble = 0; $$ = "bool";   }
     | ExprAdd {$$=$1;}
 ;
 
@@ -328,7 +329,7 @@ ExprAdd
                                 else if(strcmp($<s_val>1,"float") == 0){
                                     fprintf(fout,"fadd\n");
                                 }
-                                assignAble = 0;$$ =  $<s_val>1;}
+                                arr = 0;assignAble = 0;$$ =  $<s_val>1;}
     | ExprAdd '-' ExprMul     { if(strcmp($<s_val>1, $<s_val>3) != 0){
                                     if(strcmp($<s_val>1, "none") != 0 && strcmp($<s_val>3, "none") != 0){
                                         printf("error:%d: invalid operation: SUB (mismatched types %s and %s)\n",yylineno,$<s_val>1,$<s_val>3);
@@ -341,7 +342,7 @@ ExprAdd
                                 else if(strcmp($<s_val>1,"float") == 0){
                                     fprintf(fout,"fsub\n");
                                 }
-                                assignAble = 0;$$ =  $<s_val>1;}   
+                                arr = 0;assignAble = 0;$$ =  $<s_val>1;}   
     | ExprMul {$$=$1;}               
 ;
 
@@ -352,14 +353,14 @@ ExprMul
                                         else if(strcmp($<s_val>1,"float") == 0){
                                             fprintf(fout,"fmul\n");
                                         }
-                                        assignAble = 0; $$ = $<s_val>1;}
+                                        arr = 0;assignAble = 0; $$ = $<s_val>1;}
     | ExprMul '/' ExprUnary         {   if(strcmp($<s_val>1,"int") == 0){
                                             fprintf(fout,"idiv\n");
                                         }
                                         else if(strcmp($<s_val>1,"float") == 0){
                                             fprintf(fout,"fdiv\n");
                                         }
-                                        assignAble = 0; $$ = $<s_val>1;}
+                                        arr = 0;assignAble = 0; $$ = $<s_val>1;}
     | ExprMul '%' ExprUnary         {   if(strcmp($<s_val>1,"int") != 0){
                                             printf("error:%d: invalid operation: (operator REM not defined on %s)\n",yylineno,$<s_val>1);
                                             HAS_ERROR =true;
@@ -371,7 +372,7 @@ ExprMul
                                         if(strcmp($<s_val>1,"int") == 0){
                                             fprintf(fout,"idiv\n");
                                         }
-                                        assignAble = 0; $$ = $<s_val>1;}
+                                        arr = 0;assignAble = 0; $$ = $<s_val>1;}
     |ExprUnary {$$=$1;}
 ;
 
@@ -382,12 +383,12 @@ ExprUnary
                                         else if(strcmp( $<s_val>2,"float") == 0){
                                             fprintf(fout,"fneg\n");
                                         }  
-                                        assignAble = 0; $$ = $<s_val>2; 
+                                        arr = 0;assignAble = 0; $$ = $<s_val>2; 
                                     }
-    | '+' ExprUnary                   { assignAble = 0; $$ = $<s_val>2; }
+    | '+' ExprUnary                   { arr = 0;assignAble = 0; $$ = $<s_val>2; }
     | '!'  ExprUnary         {      fprintf(fout,"iconst_1\n");
                                     fprintf(fout,"ixor\n");
-                                    assignAble = 0; $$ = $<s_val>2; }
+                                    arr = 0;assignAble = 0; $$ = $<s_val>2; }
     | Primary {$$=$1;}
 
 Primary

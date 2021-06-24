@@ -4,120 +4,66 @@
 .method public static main([Ljava/lang/String;)V
 .limit stack 100
 .limit locals 100
-ldc 3
-newarray int
-astore 0
-aload 0
-ldc 0
-ldc 1
-ldc 2
-iadd
-iastore
-aload 0
-ldc 1
-aload 0
-ldc 0
-iaload
-ldc 1
+ldc 400
+istore 0
+ldc 700
+istore 1
+iload 0
+ldc 400
 isub
-iastore
-aload 0
-ldc 2
-aload 0
-ldc 2
-ldc 1
+ifeq L_cmp_0
+iconst_0
+goto L_cmp_1
+L_cmp_0:
+iconst_1
+L_cmp_1:
+ifeq L_if_false_0
+ldc "OuO\n"
+getstatic java/lang/System/out Ljava/io/PrintStream;
+swap
+invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
+
+iload 1
+ldc 600
 isub
-iaload
-ldc 3
-imul
-iastore
-aload 0
-ldc 0
-getstatic java/lang/System/out Ljava/io/PrintStream;
-swap
-invokevirtual java/io/PrintStream/print(I)V
-
-ldc "\n"
+ifle L_cmp_2
+iconst_0
+goto L_cmp_3
+L_cmp_2:
+iconst_1
+L_cmp_3:
+ifeq L_if_false_1
+ldc "No\n"
 getstatic java/lang/System/out Ljava/io/PrintStream;
 swap
 invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 
-aload 0
-ldc 1
-getstatic java/lang/System/out Ljava/io/PrintStream;
-swap
-invokevirtual java/io/PrintStream/print(I)V
-
-ldc "\n"
-getstatic java/lang/System/out Ljava/io/PrintStream;
-swap
-invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
-
-aload 0
-ldc 2
-getstatic java/lang/System/out Ljava/io/PrintStream;
-swap
-invokevirtual java/io/PrintStream/print(I)V
-
-ldc "\n"
-getstatic java/lang/System/out Ljava/io/PrintStream;
-swap
-invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
-
-ldc 3
-newarray float
-astore 1
-aload 1
-ldc 0
-ldc 1.000000
-ldc 2.000000
-fadd
-fastore
-aload 1
-ldc 1
-aload 1
-ldc 0
-faload
-ldc 1.000000
-fsub
-fastore
-aload 1
-ldc 2
-aload 1
-ldc 2
-ldc 1
+L_if_false_1:
+iload 1
+ldc 700
 isub
-faload
-ldc 3.000000
-fdiv
-fastore
-aload 1
-ldc 0
-getstatic java/lang/System/out Ljava/io/PrintStream;
-swap
-invokevirtual java/io/PrintStream/print(F)V
-
-ldc "\n"
+ifeq L_cmp_4
+iconst_0
+goto L_cmp_5
+L_cmp_4:
+iconst_1
+L_cmp_5:
+ifeq L_if_false_2
+ldc "Value of v1 is 400 and v2 is 700"
 getstatic java/lang/System/out Ljava/io/PrintStream;
 swap
 invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 
-aload 1
-ldc 1
-getstatic java/lang/System/out Ljava/io/PrintStream;
-swap
-invokevirtual java/io/PrintStream/print(F)V
-
-ldc "\n"
+L_if_false_2:
+ifeq L_if_false_3
+ldc "QuQ\n"
 getstatic java/lang/System/out Ljava/io/PrintStream;
 swap
 invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 
-aload 1
-ldc 2
-getstatic java/lang/System/out Ljava/io/PrintStream;
-swap
-invokevirtual java/io/PrintStream/print(F)V
-
+L_if_false_3:
+L_if_false_0:
+L_if_false_-1:
+L_if_false_-1:
 	return
 .end method

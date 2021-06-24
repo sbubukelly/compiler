@@ -475,7 +475,7 @@ If
                                     printf("error:%d: non-bool (type %s) used as for condition\n",yylineno + 1,$<s_val>3);
                                     HAS_ERROR =true;
                             }
-                            fprintf(fout,"ifeq L_if_false_%d/n",IfCount);
+                            fprintf(fout,"ifeq L_if_false_%d\n",IfCount);
                             IfStack[IfStackCount] = IfCount;
                             IfStackCount++;
                             IfCount ++;
@@ -487,7 +487,7 @@ If
                                     break;
                                 }
                             }
-                            fprintf(fout,"L_if_false_%d:/n",IfStack[curStack]);
+                            fprintf(fout,"L_if_false_%d:\n",IfStack[curStack]);
                             IfStack[curStack] = -1;
                             IfStackCount--;
                         }
@@ -501,7 +501,7 @@ If_block
                         break;
                     }
                 }
-                fprintf(fout,"L_if_false_%d:/n",IfStack[curStack]);
+                fprintf(fout,"L_if_false_%d:\n",IfStack[curStack]);
                 IfStack[curStack] = -1;
                 IfStackCount--;
                 
@@ -513,13 +513,13 @@ If_block
                         break;
                     }
                 }
-                fprintf(fout,"L_if_false_%d:/n",IfStack[curStack]);
+                fprintf(fout,"L_if_false_%d:\n",IfStack[curStack]);
                 IfStack[curStack] = -1;
                 IfStackCount--;
                 
             }  
 ElseBlock
-    : ELSE { fprintf(fout,"ifeq L_if_false_%d/n",IfCount);
+    : ELSE { fprintf(fout,"ifeq L_if_false_%d\n",IfCount);
                     IfStack[IfStackCount] = IfCount;
                     IfStackCount++;
                     IfCount ++;

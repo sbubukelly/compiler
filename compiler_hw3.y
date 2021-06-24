@@ -533,7 +533,7 @@ int main(int argc, char *argv[])
 }
 
 static void print(char *type){
-    if(strcmp(type,"array") == 0){
+    if(elementType != NULL){
         fprintf(fout,"%caload",type[0]);
     }
     if(strcmp(type,"bool") != 0){

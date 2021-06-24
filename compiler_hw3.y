@@ -233,7 +233,7 @@ DeclarationStmt
     : Type ID                   {insert_symbol($<s_val>2, $<s_val>1, "-",0);}
     | Type ID '=' Expr          {insert_symbol($<s_val>2, $<s_val>1, "-",1);}
     | Type ID '[' Expr ']'      {insert_symbol($<s_val>2,"array", $<s_val>1,0);assignAble = 1;}
-    | Type ID '[' Expr ']' '=' Expr     {insert_symbol($<s_val>2,"array", $<s_val>1);assignAble = 1;}
+    | Type ID '[' Expr ']' '=' Expr     {insert_symbol($<s_val>2,"array", $<s_val>1,1);assignAble = 1;}
 ;
 
 
@@ -597,6 +597,9 @@ static void store(struct Node* node){
     else if(strcmp(type,"string") == 0){
         fprintf(fout,"astore %d\n",addr);
     }
+    else if(strcmp(type,"bool") == 0){
+        fprintf(fout,"istore %d\n",addr);
+    }
     else if(strcmp(type,"array") == 0){
         fprintf(fout,"%castore\n",eleType[0]);
     }
@@ -646,7 +649,7 @@ static void insert_symbol(char *name, char *type, char *elementType,int assign) 
 
     if(strcmp(type,"array") == 0){
          fprintf(fout,"newarray %s\n",elementType);
-         fprintf(fout,"astore %d",addr);
+         fprintf(fout,"astore %d",new_node->address);
     }
 
     if(!assign){

@@ -36,8 +36,8 @@
     char *elementType = NULL;
     char typeChange;
     int assignAble = 1,assigned = 1,assignedID = 1,arr = 0,isFor = 0;
-    int boolCount = 0,compareCount = 0,IfCount = 0;
-    int IfStack[10],IfStackCount = 0;
+    int boolCount = 0,compareCount = 0,IfCount = 0,IfExitStackCount = 0;
+    int IfStack[10],IfExitStack[10],IfStackCount = 0;
     struct Node *assignedNode = NULL;
     
 
@@ -477,53 +477,78 @@ If
                             fprintf(fout,"ifeq L_if_false_%d\n",IfCount);
                             IfStack[IfStackCount] = IfCount;
                             IfStackCount++;
+                            IfExitStack[IfExitStackCount] = IfCount;
+                            IfExitStackCount ++;
                             IfCount ++;
-                        } If_block {
-                            int curStack = 0;
-                            for(int i = 9;i >=0;i --){
-                                if(IfStack[i] != -1){
-                                    curStack = i;
-                                    break;
-                                }
-                            }
-                            fprintf(fout,"L_if_false_%d:\n",IfStack[curStack]);
-                            IfStack[curStack] = -1;
-                            IfStackCount--;
-                        }
+                        } If_block 
 ;
 
 If_block
-    : Block {   int curStack = 0;
+    : Block {   int curStack1 = 0;
+                int curStack2 = 0;
                 for(int i = 9;i >=0;i --){
                     if(IfStack[i] != -1){
-                        curStack = i;
+                        curStack1 = i;
                         break;
                     }
                 }
-                fprintf(fout,"L_if_false_%d:\n",IfStack[curStack]);
+                for(int i = 9;i >=0;i --){
+                    if(IfExitStack[i] != -1){
+                        curStack2 = i;
+                        break;
+                    }
+                }
+                fprintf(fout,"goto L_if_exit_%d\n",IfExitStack[curStack2]);
+                fprintf(fout,"L_if_false_%d:\n",IfStack[curStack1]);
                 IfStack[curStack] = -1;
                 IfStackCount--;
                 
-            }  ElseBlock
-    |  Block {   int curStack = 0;
+            }   ElseBlock
+    | Block {   int curStack1 = 0;
+                int curStack2 = 0;
                 for(int i = 9;i >=0;i --){
                     if(IfStack[i] != -1){
-                        curStack = i;
+                        curStack1 = i;
                         break;
                     }
                 }
-                fprintf(fout,"L_if_false_%d:\n",IfStack[curStack]);
+                for(int i = 9;i >=0;i --){
+                    if(IfExitStack[i] != -1){
+                        curStack2 = i;
+                        break;
+                    }
+                }
+                fprintf(fout,"goto L_if_exit_%d\n",IfExitStack[curStack2]);
+                fprintf(fout,"L_if_false_%d:\n",IfStack[curStack1]);
                 IfStack[curStack] = -1;
                 IfStackCount--;
+                fprintf(fout,"L_if_exit_%d:\n",IfExitStack[curStack2]);
+                IfExitStack[curStack] = -1;
+                IfExitStackCount--;
                 
             }  
 ElseBlock
-    : ELSE { fprintf(fout,"ifeq L_if_false_%d\n",IfCount);
-                    IfStack[IfStackCount] = IfCount;
-                    IfStackCount++;
-                    IfCount ++;
-            }Block 
-    | ELSE If
+    : ELSE Block{    
+                int curStack2 = 0;
+                for(int i = 9;i >=0;i --){
+                    if(IfExitStack[i] != -1){
+                        curStack2 = i;
+                        break;
+                    }
+                }
+                fprintf(fout,"L_if_exit_%d:\n",IfExitStack[curStack2]);
+                IfExitStack[curStack] = -1;
+                IfExitStackCount--;
+            }
+    | ELSE  IF  '(' Expr ')' {   if(strcmp($<s_val>3, "bool") != 0){
+                                    printf("error:%d: non-bool (type %s) used as for condition\n",yylineno + 1,$<s_val>3);
+                                    HAS_ERROR =true;
+                                    }
+                                fprintf(fout,"ifeq L_if_false_%d\n",IfCount);
+                                IfStack[IfStackCount] = IfCount;
+                                IfStackCount++;
+                                IfCount ++;
+                            } If_block 
 ;
 
 
@@ -571,6 +596,7 @@ int main(int argc, char *argv[])
     }
     for(int i = 0;i < 10;i ++){
         IfStack[i] = -1;
+        IfExitStack[i] = -1;
     }
     /* Codegen output init */
     char *bytecode_filename = "hw3.j";

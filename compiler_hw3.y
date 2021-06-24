@@ -500,7 +500,7 @@ If_block
                 }
                 fprintf(fout,"goto L_if_exit_%d\n",IfExitStack[curStack2]);
                 fprintf(fout,"L_if_false_%d:\n",IfStack[curStack1]);
-                IfStack[curStack] = -1;
+                IfStack[curStack1] = -1;
                 IfStackCount--;
                 
             }   ElseBlock
@@ -520,10 +520,10 @@ If_block
                 }
                 fprintf(fout,"goto L_if_exit_%d\n",IfExitStack[curStack2]);
                 fprintf(fout,"L_if_false_%d:\n",IfStack[curStack1]);
-                IfStack[curStack] = -1;
+                IfStack[curStack1] = -1;
                 IfStackCount--;
                 fprintf(fout,"L_if_exit_%d:\n",IfExitStack[curStack2]);
-                IfExitStack[curStack] = -1;
+                IfExitStack[curStack2] = -1;
                 IfExitStackCount--;
                 
             }  
@@ -537,7 +537,7 @@ ElseBlock
                     }
                 }
                 fprintf(fout,"L_if_exit_%d:\n",IfExitStack[curStack2]);
-                IfExitStack[curStack] = -1;
+                IfExitStack[curStack2] = -1;
                 IfExitStackCount--;
             }
     | ELSE  IF  '(' Expr ')' {   if(strcmp($<s_val>3, "bool") != 0){

@@ -530,12 +530,12 @@ ElseBlock
 For
     :FOR '(' Assignment SEMICOLON { fprintf(fout,"L_for_start:\n");
                                     } Expr {   fprintf(fout,"ifeq L_for_exit\n");
-                                    } SEMICOLON ID ForIncDec
+                                    } SEMICOLON ForIncDec
 
 ;
 
 ForIncDec
-    :INC ')' Block  {   struct Node *tmp = lookup_symbol($<s_val>9);
+    :ID INC ')' Block  {   struct Node *tmp = lookup_symbol($<s_val>1);
                         fprintf(fout,"iload%d",tmp->address);
                         fprintf(fout,"ldc %c\n",'1');
                         fprintf(fout,"%cadd\n",'i');
@@ -543,7 +543,7 @@ ForIncDec
                         fprintf(fout,"goto L_for_start\n");
                         fprintf(fout,"L_for_exit:\n");
                     }
-    |DEC ')' Block  {   struct Node *tmp = lookup_symbol($<s_val>9);
+    |ID DEC ')' Block  {   struct Node *tmp = lookup_symbol($<s_val>1);
                         fprintf(fout,"iload%d",tmp->address);
                         fprintf(fout,"ldc %c\n",'1');
                         fprintf(fout,"%csub\n",'i');

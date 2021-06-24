@@ -264,7 +264,7 @@ IncDecExpr
                         if(strcmp($<s_val>1,"int") == 0){tmp1 = "1";tmp2 = 'i';}
                         else if(strcmp($<s_val>1,"float") == 0){tmp1 = "1.0";tmp2 = 'f';}
                         fprintf(fout,"ldc %s\n",tmp1);
-                        fprintf(fout,"%cadd\n",tmp2);
+                        fprintf(fout,"%csub\n",tmp2);
                         store(assignedNode);
                         assignAble = 0; $$=$1;}
 ;
@@ -486,9 +486,7 @@ If
                                     break;
                                 }
                             }
-                            fprintf(fout,"goto L_if_exit_%d:\n",IfStack[curStack]);
                             fprintf(fout,"L_if_false_%d:\n",IfStack[curStack]);
-                            fprintf(fout,"L_if_exit_%d:\n",IfStack[curStack]);
                             IfStack[curStack] = -1;
                             IfStackCount--;
                         }

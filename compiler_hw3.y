@@ -540,7 +540,7 @@ ElseBlock
                 IfExitStack[curStack2] = -1;
                 IfExitStackCount--;
             }
-    | ELSE  IF  '(' Expr ')' {   if(strcmp($<s_val>3, "bool") != 0){
+    | ELSE  IF  '(' Expr ')' {   if(strcmp($<s_val>4, "bool") != 0){
                                     printf("error:%d: non-bool (type %s) used as for condition\n",yylineno + 1,$<s_val>3);
                                     HAS_ERROR =true;
                                     }

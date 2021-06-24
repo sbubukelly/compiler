@@ -41,9 +41,6 @@
     char *incdec = NULL;
     struct Node *assignedNode = NULL;
     
-    for(int i = 0;i < 10;i ++){
-        IfStack[i] = -1;
-    }
 
     void yyerror (char const *s)
     {
@@ -554,7 +551,9 @@ int main(int argc, char *argv[])
     } else {
         yyin = stdin;
     }
-
+    for(int i = 0;i < 10;i ++){
+        IfStack[i] = -1;
+    }
     /* Codegen output init */
     char *bytecode_filename = "hw3.j";
     fout = fopen(bytecode_filename, "w");

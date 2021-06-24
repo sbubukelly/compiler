@@ -791,7 +791,6 @@ static struct Node* lookup_symbol(char *name) {
 }
 
 static void dump_symbol() {
-    int index = 0;
     struct Node *node = table[Scope];
     while (node != NULL) {
         struct Node *tmp = node;

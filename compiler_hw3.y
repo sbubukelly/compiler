@@ -536,7 +536,7 @@ For
 
 ForIncDec
     :ID INC ')' Block  {   struct Node *tmp = lookup_symbol($<s_val>1);
-                        fprintf(fout,"iload%d\n",tmp->address);
+                        fprintf(fout,"iload %d\n",tmp->address);
                         fprintf(fout,"ldc %c\n",'1');
                         fprintf(fout,"%cadd\n",'i');
                         store(assignedNode);
@@ -544,7 +544,7 @@ ForIncDec
                         fprintf(fout,"L_for_exit:\n");
                     }
     |ID DEC ')' Block  {   struct Node *tmp = lookup_symbol($<s_val>1);
-                        fprintf(fout,"iload%d\n",tmp->address);
+                        fprintf(fout,"iload %d\n",tmp->address);
                         fprintf(fout,"ldc %c\n",'1');
                         fprintf(fout,"%csub\n",'i');
                         store(assignedNode);

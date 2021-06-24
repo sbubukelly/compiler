@@ -494,8 +494,7 @@ If
 ;
 
 If_block
-    : Block     
-    | Block {   int curStack = 0;
+    : Block {   int curStack = 0;
                 for(int i = 9;i >=0;i --){
                     if(IfStack[i] != -1){
                         curStack = i;
@@ -506,23 +505,26 @@ If_block
                 IfStack[curStack] = -1;
                 IfStackCount--;
                 
-            }ELSE { fprintf(fout,"ifeq L_if_false_%d/n",IfCount);
+            }  ElseBlock
+    |  Block {   int curStack = 0;
+                for(int i = 9;i >=0;i --){
+                    if(IfStack[i] != -1){
+                        curStack = i;
+                        break;
+                    }
+                }
+                fprintf(fout,"L_if_false_%d:/n",IfStack[curStack]);
+                IfStack[curStack] = -1;
+                IfStackCount--;
+                
+            }  
+ElseBlock
+    : ELSE { fprintf(fout,"ifeq L_if_false_%d/n",IfCount);
                     IfStack[IfStackCount] = IfCount;
                     IfStackCount++;
                     IfCount ++;
             }Block 
-    | Block {   int curStack = 0;
-                for(int i = 9;i >=0;i --){
-                    if(IfStack[i] != -1){
-                        curStack = i;
-                        break;
-                    }
-                }
-                fprintf(fout,"L_if_false_%d:/n",IfStack[curStack]);
-                IfStack[curStack] = -1;
-                IfStackCount--;
-                
-            }ELSE If
+    | ELSE If
 ;
 
 

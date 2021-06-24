@@ -549,7 +549,7 @@ For
 ;
 
 ForClause
-    : Assignment SEMICOLON {fprintf(fout,"L_for_start:\n");} Expr {fprintf(fout,"ifeq L_for_exit\n");} SEMICOLON  IncDecExpr
+    : Assignment SEMICOLON {isFor = 1;fprintf(fout,"L_for_start:\n");} Expr {fprintf(fout,"ifeq L_for_exit\n");} SEMICOLON  IncDecExpr
 
 Block
     : '{'{ create_symbol(); } StatementList '}'        { dump_symbol(); }

@@ -534,7 +534,7 @@ int main(int argc, char *argv[])
 }
 
 static void print(char *type){
-    if(elementType != NULL){
+    if(arr == 1){
         fprintf(fout,"%caload\n",type[0]);
     }
     if(strcmp(type,"bool") != 0){

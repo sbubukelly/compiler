@@ -534,8 +534,8 @@ int main(int argc, char *argv[])
 }
 
 static void print(char *type){
-    if(arr == 1){
-        fprintf(fout,"%caload",type[0]);
+    if(elementType != NULL){
+        fprintf(fout,"%caload\n",type[0]);
     }
     if(strcmp(type,"bool") != 0){
         fprintf(fout,"getstatic java/lang/System/out Ljava/io/PrintStream;\n");

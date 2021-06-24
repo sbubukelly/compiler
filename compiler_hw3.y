@@ -35,8 +35,9 @@
     int AddressNum = 0;
     char *elementType = NULL;
     char typeChange;
-    int assignAble = 1,assigned = 1,assignedID = 1,arr = 0;
+    int assignAble = 1,assigned = 1,assignedID = 1,arr = 0,isFor = 0;
     int boolCount = 0,compareCount = 0;
+    char *incdec = NULL;
     struct Node *assignedNode = NULL;
     
     void yyerror (char const *s)
@@ -253,17 +254,29 @@ IncDecExpr
                         char tmp2;
                         if(strcmp($<s_val>1,"int") == 0){tmp1 = "1";tmp2 = 'i';}
                         else if(strcmp($<s_val>1,"float") == 0){tmp1 = "1.0";tmp2 = 'f';}
-                        fprintf(fout,"ldc %s\n",tmp1);
-                        fprintf(fout,"%cadd\n",tmp2);
-                        store(assignedNode);
+                        if(isFor == 0){
+                            fprintf(fout,"ldc %s\n",tmp1);
+                            fprintf(fout,"%cadd\n",tmp2);
+                            store(assignedNode);
+                        }
+                        else if(isFor != 0){
+                            sprintf(incdec,"ldc %s\n",tmp1);
+                            sprintf(incdec,"%cadd\n",tmp2);
+                        }
                         assignAble = 0; $$=$1;}
     | Expr DEC       {  char *tmp1;
                         char tmp2;
                         if(strcmp($<s_val>1,"int") == 0){tmp1 = "1";tmp2 = 'i';}
                         else if(strcmp($<s_val>1,"float") == 0){tmp1 = "1.0";tmp2 = 'f';}
-                        fprintf(fout,"ldc %s\n",tmp1);
-                        fprintf(fout,"%csub\n",tmp2);
-                        store(assignedNode);
+                        if(isFor == 0){
+                            fprintf(fout,"ldc %s\n",tmp1);
+                            fprintf(fout,"%csub\n",tmp2);
+                            store(assignedNode);
+                        }
+                        else if(isFor != 0){
+                            sprintf(incdec,"ldc %s\n",tmp1);
+                            sprintf(incdec,"%csub\n",tmp2);
+                        }
                         assignAble = 0; $$=$1;}
 ;
 
@@ -483,14 +496,16 @@ If_block
 
 
 For
-    :FOR '(' ForClause ')' Block    {   fprintf(fout,"goto L_for_start\n");
+    :FOR '(' ForClause ')' Block    {   fprintf(fout,"%s",incdec);
+                                        store(assignedNode);
+                                        fprintf(fout,"goto L_for_start\n");
                                         fprintf(fout,"L_for_exit:\n");
                                     }
 
 ;
 
 ForClause
-    : Assignment SEMICOLON {fprintf(fout,"L_for_start:\n");} Expr {fprintf(fout,"ifeq L_for_exit\n");} SEMICOLON IncDecExpr
+    : Assignment SEMICOLON {fprintf(fout,"L_for_start:\n");} Expr {fprintf(fout,"ifeq L_for_exit\n");} SEMICOLON {isFor = 1;} IncDecExpr
 
 Block
     : '{'{ create_symbol(); } StatementList '}'        { dump_symbol(); }

@@ -486,7 +486,9 @@ If
                                     break;
                                 }
                             }
+                            fprintf(fout,"goto L_if_exit_%d:\n",IfStack[curStack]);
                             fprintf(fout,"L_if_false_%d:\n",IfStack[curStack]);
+                            fprintf(fout,"L_if_exit_%d:\n",IfStack[curStack]);
                             IfStack[curStack] = -1;
                             IfStackCount--;
                         }

@@ -259,7 +259,7 @@ IncDecExpr
                             fprintf(fout,"%cadd\n",tmp2);
                             store(assignedNode);
                         }
-                        else if(isFor != 0){
+                        else if(isFor == 1){
                             sprintf(incdec,"ldc %s\n",tmp1);
                             sprintf(incdec,"%cadd\n",tmp2);
                         }
@@ -273,7 +273,7 @@ IncDecExpr
                             fprintf(fout,"%csub\n",tmp2);
                             store(assignedNode);
                         }
-                        else if(isFor != 0){
+                        else if(isFor == 1){
                             sprintf(incdec,"ldc %s\n",tmp1);
                             sprintf(incdec,"%csub\n",tmp2);
                         }
@@ -496,7 +496,7 @@ If_block
 
 
 For
-    :FOR '(' ForClause ')' Block    {   fprintf(fout,"%s",incdec);
+    :FOR {isFor = 1;}'(' ForClause ')' Block    {   fprintf(fout,"%s",incdec);
                                         store(assignedNode);
                                         fprintf(fout,"goto L_for_start\n");
                                         fprintf(fout,"L_for_exit:\n");
@@ -505,7 +505,7 @@ For
 ;
 
 ForClause
-    : Assignment SEMICOLON {fprintf(fout,"L_for_start:\n");} Expr {fprintf(fout,"ifeq L_for_exit\n");} SEMICOLON {isFor = 1;} IncDecExpr
+    : Assignment SEMICOLON {fprintf(fout,"L_for_start:\n");} Expr {fprintf(fout,"ifeq L_for_exit\n");} SEMICOLON  IncDecExpr
 
 Block
     : '{'{ create_symbol(); } StatementList '}'        { dump_symbol(); }

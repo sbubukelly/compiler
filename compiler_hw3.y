@@ -392,9 +392,9 @@ ExprUnary
     | Primary {$$=$1;}
 
 Primary
-    : Operand { $$=$1;}
+    : Operand { $$=$1;arr = 0;}
     | Array { $$=$1;}
-    | ChangeType {$$=$1;}
+    | ChangeType {$$=$1;arr = 0;}
 ;
 
 Array

@@ -35,7 +35,7 @@
     int AddressNum = 0;
     char *elementType = NULL;
     char typeChange;
-    int assignAble = 1,assigned = 1,assignedID = 1,a = 0;
+    int assignAble = 1,assigned = 1,assignedID = 1;
     int boolCount = 0,compareCount = 0;
     struct Node *assignedNode = NULL;
     
@@ -397,7 +397,10 @@ Primary
 ;
 
 Array
-    : Operand '[' Expr ']'      { $$ = elementType; assignAble = 1; }
+    : Operand '[' Expr ']'      {   if(assignedID == 0){
+                                        fprintf(fout,"%caload\n",elementType[0]);
+                                    }
+                                    $$ = elementType; assignAble = 1; }
 ;
 
 ChangeType
@@ -647,10 +650,6 @@ static void insert_symbol(char *name, char *type, char *elementType,int assign) 
     
     printf("> Insert {%s} into symbol table (scope level: %d)\n", name, Scope);
 
-    if(strcmp(type,"array") == 0){
-         fprintf(fout,"newarray %s\n",elementType);
-         fprintf(fout,"astore %d",new_node->address);
-    }
 
     if(!assign){
         if(strcmp(type,"int") == 0){
@@ -666,7 +665,18 @@ static void insert_symbol(char *name, char *type, char *elementType,int assign) 
             fprintf(fout,"iconst_0\n");
         }
     }
-    store(new_node);
+    if(strcmp(type,"array") == 0){
+         fprintf(fout,"newarray %s\n",elementType);
+         if(!assign){
+            fprintf(fout,"astore %d\n",new_node->address);
+         }
+         else{
+            store(new_node); 
+         }
+    }
+    else{
+        store(new_node);
+    }
     
 }
 

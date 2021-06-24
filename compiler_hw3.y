@@ -496,7 +496,7 @@ If_block
 
 
 For
-    :FOR '(' ForClause ')' Block    {   fprintf(fout,"%s",incdec);
+    :FOR '(' ForClause ')' Block    {  
                                         store(assignedNode);
                                         fprintf(fout,"goto L_for_start\n");
                                         fprintf(fout,"L_for_exit:\n");

@@ -533,7 +533,9 @@ int main(int argc, char *argv[])
 }
 
 static void print(char *type){
-
+    if(strcmp(type,"array") == 0){
+        fprintf(fout,"%caload",type[0]);
+    }
     if(strcmp(type,"bool") != 0){
         fprintf(fout,"getstatic java/lang/System/out Ljava/io/PrintStream;\n");
         fprintf(fout,"swap\n");
